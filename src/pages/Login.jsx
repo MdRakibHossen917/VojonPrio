@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { FaEnvelope, FaLock, FaArrowRight } from 'react-icons/fa'
 import { FaGoogle } from 'react-icons/fa'
@@ -61,7 +62,12 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center">
+    <>
+      <Helmet>
+        <title>লগইন করুন - ভোজনপ্রিয়</title>
+        <meta name="description" content="ভোজনপ্রিয় অ্যাকাউন্টে লগইন করুন এবং খাঁটি খাবার কিনুন।" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center">
       <div className="container mx-auto px-4">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
@@ -174,7 +180,8 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

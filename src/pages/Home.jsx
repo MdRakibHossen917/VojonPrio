@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { FaCheckCircle, FaTruck, FaShieldAlt, FaLeaf, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import ProductCard from '../components/ProductCard'
@@ -101,8 +102,17 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
+    <>
+      <Helmet>
+        <title>ভোজনপ্রিয় - খাঁটি খাবারের বিশ্বস্ত ঠিকানা</title>
+        <meta name="description" content="ভোজনপ্রিয় থেকে কিনুন 100% খাঁটি সরিষার তেল, খাঁটি মধু, গরুর পায়া, মহিষের মাথা, গরুর ভুঁড়ি এবং টাঙ্গাইলের মিষ্টি। সরাসরি গ্রাম থেকে সংগ্রহ করা স্বাস্থ্যসম্মত খাবার।" />
+        <meta name="keywords" content="ভোজনপ্রিয়, খাঁটি খাবার, সরিষার তেল, মধু, গরুর পায়া, মহিষের মাথা, গরুর ভুঁড়ি, টাঙ্গাইলের মিষ্টি, বাংলাদেশি খাবার, প্রাকৃতিক খাবার" />
+        <meta property="og:title" content="ভোজনপ্রিয় - খাঁটি খাবারের বিশ্বস্ত ঠিকানা" />
+        <meta property="og:description" content="100% খাঁটি ও স্বাস্থ্যসম্মত খাবার। সরাসরি গ্রাম থেকে সংগ্রহ করে আপনার কাছে পৌঁছে দেওয়া।" />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      <div className="min-h-screen">
+        {/* Hero Section */}
       <section className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -373,7 +383,8 @@ const Home = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }
 

@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { FaSearch, FaBox } from 'react-icons/fa'
 import ProductCard from '../components/ProductCard'
 import productsData from '../data/products.json'
@@ -26,7 +27,12 @@ const Search = () => {
   const searchResults = searchProducts(query)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+    <>
+      <Helmet>
+        <title>{query ? `"${query}" এর জন্য ফলাফল` : 'পণ্য খুঁজুন'} - ভোজনপ্রিয়</title>
+        <meta name="description" content="ভোজনপ্রিয়-এ পণ্য খুঁজুন। খাঁটি ও স্বাস্থ্যসম্মত খাবার সহজেই খুঁজে পান।" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
       <div className="container mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -83,7 +89,8 @@ const Search = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

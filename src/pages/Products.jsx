@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { FaFilter } from 'react-icons/fa'
 import ProductCard from '../components/ProductCard'
 import productsData from '../data/products.json'
@@ -15,7 +16,13 @@ const Products = () => {
       : productsData.filter((product) => product.category === selectedCategory)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+    <>
+      <Helmet>
+        <title>আমাদের পণ্য - ভোজনপ্রিয়</title>
+        <meta name="description" content="ভোজনপ্রিয় থেকে কিনুন 100% খাঁটি ও স্বাস্থ্যসম্মত খাবার। সরিষার তেল, মধু, মাংস, মিষ্টি এবং আরও অনেক কিছু।" />
+        <meta name="keywords" content="ভোজনপ্রিয়, খাঁটি খাবার, পণ্য, সরিষার তেল, মধু, মাংস, মিষ্টি" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">আমাদের পণ্য</h1>
@@ -66,7 +73,8 @@ const Products = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

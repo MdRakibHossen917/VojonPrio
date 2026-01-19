@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useNavigate, Link } from 'react-router-dom'
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaArrowRight, FaGoogle } from 'react-icons/fa'
 import { useAuth } from '../context/AuthContext'
@@ -87,7 +88,12 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center">
+    <>
+      <Helmet>
+        <title>রেজিস্টার করুন - ভোজনপ্রিয়</title>
+        <meta name="description" content="ভোজনপ্রিয়-এ নতুন অ্যাকাউন্ট তৈরি করুন এবং খাঁটি খাবার কিনুন।" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center">
       <div className="container mx-auto px-4">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
@@ -229,7 +235,8 @@ const Register = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

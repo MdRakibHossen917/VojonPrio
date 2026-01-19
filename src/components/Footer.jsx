@@ -1,4 +1,4 @@
-import { FaFacebook, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaFacebook, FaPhone, FaEnvelope, FaMapMarkerAlt, FaLinkedin, FaGithub } from 'react-icons/fa'
 
 const Footer = () => {
   return (
@@ -18,14 +18,14 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">যোগাযোগ</h3>
             <div className="space-y-3">
-              <div className="flex items-center space-x-2">
+              <a href="tel:+8801300981501" className="flex items-center space-x-2 hover:text-amber-200 transition-colors">
                 <FaPhone className="text-amber-300" />
-                <span>+880 1234-567890</span>
-              </div>
-              <div className="flex items-center space-x-2">
+                <span>+8801300981501</span>
+              </a>
+              <a href="mailto:mdrakibhossencse@gmail.com" className="flex items-center space-x-2 hover:text-amber-200 transition-colors">
                 <FaEnvelope className="text-amber-300" />
-                <span>info@vojonprio.com</span>
-              </div>
+                <span>mdrakibhossencse@gmail.com</span>
+              </a>
               <div className="flex items-start space-x-2">
                 <FaMapMarkerAlt className="text-amber-300 mt-1" />
                 <span>ঢাকা, বাংলাদেশ</span>
@@ -38,10 +38,29 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">সামাজিক যোগাযোগ</h3>
             <div className="flex space-x-4">
               <a
+                href="https://www.linkedin.com/in/rakibhossen917/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-amber-700 hover:bg-amber-600 p-3 rounded-full transition-colors"
+                aria-label="LinkedIn"
+              >
+                <FaLinkedin className="text-xl" />
+              </a>
+              <a
+                href="https://github.com/MdRakibHossen917"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-amber-700 hover:bg-amber-600 p-3 rounded-full transition-colors"
+                aria-label="GitHub"
+              >
+                <FaGithub className="text-xl" />
+              </a>
+              <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-amber-700 hover:bg-amber-600 p-3 rounded-full transition-colors"
+                aria-label="Facebook"
               >
                 <FaFacebook className="text-xl" />
               </a>

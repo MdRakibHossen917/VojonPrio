@@ -133,11 +133,22 @@ export const AuthProvider = ({ children }) => {
   // Logout user
   const logout = useCallback(async () => {
     try {
-      await signOut(auth)
+      // Clear user data first
       setUserData(null)
+      setCurrentUser(null)
+      // Then sign out from Firebase
+      await signOut(auth)
+      // Ensure state is cleared after sign out
+      setTimeout(() => {
+        setUserData(null)
+        setCurrentUser(null)
+      }, 100)
       return true
     } catch (error) {
       console.error('Logout error:', error)
+      // Even if signOut fails, clear local state
+      setUserData(null)
+      setCurrentUser(null)
       return false
     }
   }, [])
@@ -171,12 +182,14 @@ export const AuthProvider = ({ children }) => {
   // Monitor authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user)
-      
       if (user) {
+        // User is logged in
+        setCurrentUser(user)
         // Fetch user data from Firestore
         await fetchUserData(user.uid)
       } else {
+        // User is logged out - clear all state
+        setCurrentUser(null)
         setUserData(null)
       }
       

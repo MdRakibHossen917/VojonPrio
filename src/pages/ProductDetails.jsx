@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { FaShoppingCart, FaArrowLeft, FaCheck } from 'react-icons/fa'
 import { useCart } from '../context/CartContext'
 import { useState } from 'react'
@@ -33,7 +34,16 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+    <>
+      <Helmet>
+        <title>{product.name} - ভোজনপ্রিয়</title>
+        <meta name="description" content={product.fullDescription || product.description} />
+        <meta name="keywords" content={`ভোজনপ্রিয়, ${product.name}, ${product.category}, খাঁটি খাবার`} />
+        <meta property="og:title" content={`${product.name} - ভোজনপ্রিয়`} />
+        <meta property="og:description" content={product.description} />
+        <meta property="og:image" content={product.image} />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
       <div className="container mx-auto px-4">
         <button
           onClick={() => navigate(-1)}
@@ -130,7 +140,8 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

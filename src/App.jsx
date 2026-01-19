@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
@@ -16,34 +17,36 @@ import Search from './pages/Search'
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetails />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route 
-                path="/checkout" 
-                element={
-                  <PrivateRoute>
-                    <Checkout />
-                  </PrivateRoute>
-                } 
-              />
-              <Route path="/search" element={<Search />} />
-            </Routes>
-          </main>
-          <Footer />
-          <Toast />
-        </div>
-      </CartProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <CartProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetails />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route 
+                  path="/checkout" 
+                  element={
+                    <PrivateRoute>
+                      <Checkout />
+                    </PrivateRoute>
+                  } 
+                />
+                <Route path="/search" element={<Search />} />
+              </Routes>
+            </main>
+            <Footer />
+            <Toast />
+          </div>
+        </CartProvider>
+      </AuthProvider>
+    </HelmetProvider>
   )
 }
 

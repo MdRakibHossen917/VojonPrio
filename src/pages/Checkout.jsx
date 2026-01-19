@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { FaCheckCircle, FaUser, FaPhone, FaMapMarkerAlt, FaEnvelope, FaStickyNote } from 'react-icons/fa'
 import { useCart } from '../context/CartContext'
@@ -51,58 +52,73 @@ const Checkout = () => {
 
   if (cartItems.length === 0 && !isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center py-20">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              আপনার কার্ট খালি
-            </h2>
-            <button
-              onClick={() => navigate('/products')}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:from-amber-600 hover:to-amber-700 transition-all duration-300"
-            >
-              পণ্য দেখুন
-            </button>
+      <>
+        <Helmet>
+          <title>চেকআউট - ভোজনপ্রিয়</title>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+          <div className="container mx-auto px-4">
+            <div className="text-center py-20">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                আপনার কার্ট খালি
+              </h2>
+              <button
+                onClick={() => navigate('/products')}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:from-amber-600 hover:to-amber-700 transition-all duration-300"
+              >
+                পণ্য দেখুন
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-2xl p-12 text-center max-w-2xl">
-          <FaCheckCircle className="text-6xl text-green-500 mx-auto mb-6" />
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            অর্ডার সফল হয়েছে!
-          </h2>
-          <p className="text-xl text-gray-600 mb-6">
-            আপনার অর্ডার গ্রহণ করা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।
-          </p>
-          <p className="text-lg text-gray-700 mb-8">
-            অর্ডার নম্বর: #{Math.random().toString(36).substr(2, 9).toUpperCase()}
-          </p>
-          <p className="text-gray-500">
-            হোম পেজে ফিরে যাচ্ছে...
-          </p>
+      <>
+        <Helmet>
+          <title>অর্ডার সফল - ভোজনপ্রিয়</title>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl p-12 text-center max-w-2xl">
+            <FaCheckCircle className="text-6xl text-green-500 mx-auto mb-6" />
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              অর্ডার সফল হয়েছে!
+            </h2>
+            <p className="text-xl text-gray-600 mb-6">
+              আপনার অর্ডার গ্রহণ করা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।
+            </p>
+            <p className="text-lg text-gray-700 mb-8">
+              অর্ডার নম্বর: #{Math.random().toString(36).substr(2, 9).toUpperCase()}
+            </p>
+            <p className="text-gray-500">
+              হোম পেজে ফিরে যাচ্ছে...
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">চেকআউট</h1>
+    <>
+      <Helmet>
+        <title>চেকআউট - ভোজনপ্রিয়</title>
+        <meta name="description" content="আপনার অর্ডার সম্পন্ন করুন। ডেলিভারি ঠিকানা এবং যোগাযোগের তথ্য দিন।" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl font-bold text-gray-800 mb-8">চেকআউট</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Checkout Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                গ্রাহক তথ্য
-              </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Checkout Form */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-2xl shadow-lg p-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                  গ্রাহক তথ্য
+                </h2>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name - Editable */}
@@ -254,7 +270,8 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

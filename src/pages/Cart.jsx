@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaShoppingBag, FaArrowRight } from 'react-icons/fa'
 import { useCart } from '../context/CartContext'
@@ -9,7 +10,11 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+      <>
+        <Helmet>
+          <title>কার্ট - ভোজনপ্রিয়</title>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
         <div className="container mx-auto px-4">
           <div className="text-center py-20">
             <FaShoppingBag className="text-6xl text-gray-400 mx-auto mb-6" />
@@ -28,11 +33,17 @@ const Cart = () => {
           </div>
         </div>
       </div>
+    </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
+    <>
+      <Helmet>
+        <title>কার্ট - ভোজনপ্রিয়</title>
+        <meta name="description" content="আপনার কার্টে থাকা পণ্যগুলো দেখুন এবং চেকআউট করুন।" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12">
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold text-gray-800 mb-8">আপনার কার্ট</h1>
 
@@ -84,7 +95,8 @@ const Cart = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 
