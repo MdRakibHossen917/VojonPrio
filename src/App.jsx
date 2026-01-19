@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Toast from './components/Toast'
+import PrivateRoute from './components/PrivateRoute'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetails from './pages/ProductDetails'
@@ -27,7 +28,14 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route 
+                path="/checkout" 
+                element={
+                  <PrivateRoute>
+                    <Checkout />
+                  </PrivateRoute>
+                } 
+              />
               <Route path="/search" element={<Search />} />
             </Routes>
           </main>

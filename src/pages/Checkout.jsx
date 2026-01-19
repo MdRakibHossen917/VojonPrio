@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 
 const Checkout = () => {
   const { cartItems, getTotalPrice, clearCart } = useCart()
-  const { user, isAuthenticated } = useAuth()
+  const { user, currentUser, isLoading } = useAuth()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
@@ -17,31 +17,17 @@ const Checkout = () => {
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  // Redirect to login if not authenticated
+  // Pre-fill user data when user is loaded
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: { pathname: '/checkout' } } })
-    } else if (user) {
-      // Pre-fill user data from login
+    if (user && currentUser) {
       setFormData(prev => ({
         ...prev,
-        name: user.name || '',
-        email: user.email || '',
+        name: user.name || currentUser.displayName || '',
+        email: user.email || currentUser.email || '',
         phone: user.phone || '',
       }))
     }
-  }, [isAuthenticated, user, navigate])
-
-  // Show loading if checking authentication
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">লোড হচ্ছে...</p>
-        </div>
-      </div>
-    )
-  }
+  }, [user, currentUser])
 
   const handleChange = (e) => {
     setFormData({

@@ -1,4 +1,18 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  updateProfile
+} from 'firebase/auth'
+import { doc, setDoc, getDoc } from 'firebase/firestore'
+import auth from '../firebase/config'
+import { db } from '../firebase/config'
+
+const googleProvider = new GoogleAuthProvider()
 
 const AuthContext = createContext()
 
@@ -11,34 +25,116 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
+  const [userData, setUserData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const login = useCallback((phone, password) => {
-    // Simple login validation (in real app, this would be an API call)
-    if (phone && password) {
-      // Generate user name from phone (in real app, get from API)
-      const userName = `User ${phone.slice(-4)}`
-      const userData = {
-        phone,
-        name: userName,
-        email: `${phone}@vojonprio.com`, // In real app, get from API
-        isAuthenticated: true
+  // Register new user
+  const register = useCallback(async (email, password, name, phone) => {
+    try {
+      // Create user account
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      // Update display name
+      await updateProfile(user, { displayName: name })
+
+      // Save additional user data to Firestore
+      const userDataToSave = {
+        uid: user.uid,
+        email: user.email,
+        name: name,
+        phone: phone,
+        createdAt: new Date().toISOString()
       }
-      // Store in localStorage first
-      localStorage.setItem('user', JSON.stringify(userData))
-      // Then update state
-      setUser(userData)
-      return { success: true, user: userData }
+
+      await setDoc(doc(db, 'users', user.uid), userDataToSave)
+      setUserData(userDataToSave)
+
+      return { success: true, user: user }
+    } catch (error) {
+      console.error('Registration error:', error)
+      let errorMessage = 'রেজিস্টারেশন ব্যর্থ হয়েছে'
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'এই ইমেইল ইতিমধ্যে ব্যবহার করা হয়েছে'
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'পাসওয়ার্ড খুবই দুর্বল'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'অবৈধ ইমেইল ঠিকানা'
+      }
+
+      return { success: false, message: errorMessage }
     }
-    return { success: false, message: 'ফোন নম্বর এবং পাসওয়ার্ড প্রয়োজন' }
   }, [])
 
-  const logout = useCallback(() => {
+  // Login user
+  const login = useCallback(async (email, password) => {
     try {
-      localStorage.removeItem('user')
-      setUser(null)
-      // Force state update
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      return { success: true, user: userCredential.user }
+    } catch (error) {
+      console.error('Login error:', error)
+      let errorMessage = 'লগইন ব্যর্থ হয়েছে'
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'এই ইমেইলের কোনো অ্যাকাউন্ট নেই'
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'ভুল পাসওয়ার্ড'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'অবৈধ ইমেইল ঠিকানা'
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'অনেকবার চেষ্টা করা হয়েছে। পরে আবার চেষ্টা করুন'
+      }
+
+      return { success: false, message: errorMessage }
+    }
+  }, [])
+
+  // Login with Google
+  const loginWithGoogle = useCallback(async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider)
+      const user = result.user
+
+      // Check if user data exists in Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      
+      if (!userDoc.exists()) {
+        // Create user data in Firestore for first-time Google sign-in
+        const userDataToSave = {
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || 'User',
+          phone: '',
+          photoURL: user.photoURL || '',
+          createdAt: new Date().toISOString(),
+          provider: 'google'
+        }
+        await setDoc(doc(db, 'users', user.uid), userDataToSave)
+        setUserData(userDataToSave)
+      }
+
+      return { success: true, user: user }
+    } catch (error) {
+      console.error('Google login error:', error)
+      let errorMessage = 'Google লগইন ব্যর্থ হয়েছে'
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'লগইন বাতিল করা হয়েছে'
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'পপআপ ব্লক করা আছে। ব্রাউজার সেটিংস চেক করুন'
+      }
+
+      return { success: false, message: errorMessage }
+    }
+  }, [])
+
+  // Logout user
+  const logout = useCallback(async () => {
+    try {
+      await signOut(auth)
+      setUserData(null)
       return true
     } catch (error) {
       console.error('Logout error:', error)
@@ -46,29 +142,61 @@ export const AuthProvider = ({ children }) => {
     }
   }, [])
 
-  // Check if user is logged in on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser)
-        setUser(parsedUser)
-      } catch (error) {
-        console.error('Error parsing user data:', error)
-        localStorage.removeItem('user')
+  // Fetch user data from Firestore
+  const fetchUserData = useCallback(async (uid) => {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', uid))
+      if (userDoc.exists()) {
+        setUserData(userDoc.data())
+      } else {
+        // If user data doesn't exist, create it from auth user
+        const user = auth.currentUser
+        if (user) {
+          const userDataToSave = {
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || 'User',
+            phone: '',
+            createdAt: new Date().toISOString()
+          }
+          await setDoc(doc(db, 'users', uid), userDataToSave)
+          setUserData(userDataToSave)
+        }
       }
+    } catch (error) {
+      console.error('Error fetching user data:', error)
     }
-    setIsLoading(false)
   }, [])
 
+  // Monitor authentication state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user)
+      
+      if (user) {
+        // Fetch user data from Firestore
+        await fetchUserData(user.uid)
+      } else {
+        setUserData(null)
+      }
+      
+      setIsLoading(false)
+    })
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe()
+  }, [fetchUserData])
+
   const value = useMemo(() => ({
-    user,
+    currentUser,
+    user: userData,
     login,
+    loginWithGoogle,
+    register,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: !!currentUser,
     isLoading
-  }), [user, login, logout, isLoading])
+  }), [currentUser, userData, login, loginWithGoogle, register, logout, isLoading])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-

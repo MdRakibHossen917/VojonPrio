@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { FaUser, FaLock, FaEnvelope, FaPhone, FaArrowRight } from 'react-icons/fa'
+import { FaUser, FaLock, FaEnvelope, FaPhone, FaArrowRight, FaGoogle } from 'react-icons/fa'
 import { useAuth } from '../context/AuthContext'
 
 const Register = () => {
@@ -12,9 +12,17 @@ const Register = () => {
     confirmPassword: '',
   })
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const { login } = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const { register, loginWithGoogle, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
 
   const handleChange = (e) => {
     setFormData({
@@ -23,68 +31,59 @@ const Register = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setSuccess(false)
+    setIsLoading(true)
 
     // Validation
     if (!formData.name || !formData.email || !formData.phone || !formData.password) {
       setError('সব ফিল্ড পূরণ করুন')
+      setIsLoading(false)
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('পাসওয়ার্ড মিলছে না')
+      setIsLoading(false)
       return
     }
 
     if (formData.password.length < 6) {
       setError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে')
+      setIsLoading(false)
       return
     }
 
-    // In real app, this would be an API call to register
-    // For demo, we'll just auto-login the user
-    const result = login(formData.phone, formData.password)
+    // Register user
+    const result = await register(
+      formData.email,
+      formData.password,
+      formData.name,
+      formData.phone
+    )
     
     if (result.success) {
-      setSuccess(true)
-      // Update user data with registration info
-      const userData = {
-        ...result.user,
-        name: formData.name,
-        email: formData.email,
-      }
-      localStorage.setItem('user', JSON.stringify(userData))
-      
-      // Redirect to home after 2 seconds
-      setTimeout(() => {
-        navigate('/')
-      }, 2000)
+      // Redirect to home after successful registration
+      navigate('/', { replace: true })
     } else {
-      setError('রেজিস্টারেশন ব্যর্থ হয়েছে')
+      setError(result.message || 'রেজিস্টারেশন ব্যর্থ হয়েছে')
+      setIsLoading(false)
     }
   }
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 flex items-center">
-        <div className="container mx-auto px-4">
-          <div className="max-w-md mx-auto">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
-              <div className="text-6xl text-green-500 mb-4">✓</div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                রেজিস্টারেশন সফল!
-              </h2>
-              <p className="text-gray-600 mb-6">
-                আপনার অ্যাকাউন্ট তৈরি হয়েছে। হোম পেজে যাচ্ছে...
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+  const handleGoogleLogin = async () => {
+    setError('')
+    setIsGoogleLoading(true)
+
+    const result = await loginWithGoogle()
+    
+    if (result.success) {
+      navigate('/', { replace: true })
+    } else {
+      setError(result.message || 'Google লগইন ব্যর্থ হয়েছে')
+      setIsGoogleLoading(false)
+    }
   }
 
   return (
@@ -118,6 +117,7 @@ const Register = () => {
                   placeholder="আপনার নাম লিখুন"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none transition-colors"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -132,9 +132,10 @@ const Register = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="আপনার ইমেইল লিখুন"
+                  placeholder="your@email.com"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none transition-colors"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -152,6 +153,7 @@ const Register = () => {
                   placeholder="01XXXXXXXXX"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none transition-colors"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -170,6 +172,7 @@ const Register = () => {
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none transition-colors"
                   required
                   minLength={6}
+                  disabled={isLoading}
                 />
               </div>
 
@@ -188,16 +191,27 @@ const Register = () => {
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none transition-colors"
                   required
                   minLength={6}
+                  disabled={isLoading}
                 />
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-4 rounded-lg text-lg font-bold hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-4 rounded-lg text-lg font-bold hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                <span>রেজিস্টার করুন</span>
-                <FaArrowRight />
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>রেজিস্টার হচ্ছে...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>রেজিস্টার করুন</span>
+                    <FaArrowRight />
+                  </>
+                )}
               </button>
             </form>
 
@@ -212,12 +226,6 @@ const Register = () => {
                 </Link>
               </p>
             </div>
-
-            <div className="mt-6 p-4 bg-amber-50 rounded-lg">
-              <p className="text-sm text-gray-600 text-center">
-                <strong>ডেমো:</strong> রেজিস্টারেশন করলে স্বয়ংক্রিয়ভাবে লগইন হয়ে যাবে
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -226,4 +234,3 @@ const Register = () => {
 }
 
 export default Register
-

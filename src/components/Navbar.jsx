@@ -7,7 +7,7 @@ import productsData from '../data/products.json'
 
 const Navbar = () => {
   const { getTotalItems } = useCart()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, currentUser, isAuthenticated, logout } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -63,12 +63,11 @@ const Navbar = () => {
     }
   }, [])
 
-  const handleLogout = (e) => {
+  const handleLogout = async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    logout()
+    await logout()
     setShowUserMenu(false)
-    // Navigate immediately
     navigate('/', { replace: true })
   }
 
@@ -190,15 +189,15 @@ const Navbar = () => {
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     <FaUser />
                   </div>
-                  <span className="hidden lg:inline">{user?.name || 'User'}</span>
+                  <span className="hidden lg:inline">{user?.name || currentUser?.displayName || 'User'}</span>
                 </button>
 
                 {/* User Dropdown Menu */}
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-gray-200">
-                      <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                      <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+                      <p className="text-sm font-semibold text-gray-800">{user?.name || currentUser?.displayName || 'User'}</p>
+                      <p className="text-xs text-gray-600 truncate">{user?.email || currentUser?.email || ''}</p>
                     </div>
                     <button
                       onClick={handleLogout}
@@ -234,14 +233,14 @@ const Navbar = () => {
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-gray-200">
-                      <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                      <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+                      <p className="text-sm font-semibold text-gray-800">{user?.name || currentUser?.displayName || 'User'}</p>
+                      <p className="text-xs text-gray-600 truncate">{user?.email || currentUser?.email || ''}</p>
                     </div>
                     <button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        logout()
+                        await logout()
                         setShowUserMenu(false)
                         navigate('/', { replace: true })
                       }}
