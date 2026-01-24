@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react'
+import { useToast } from './ToastContext'
 
 const CartContext = createContext()
 
@@ -12,29 +13,22 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([])
-  const [showToast, setShowToast] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
-
-  const showToastMessage = (message) => {
-    setToastMessage(message)
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 3000)
-  }
+  const { notify } = useToast()
 
   const addToCart = (product, quantity = 1) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id)
-      
+
       if (existingItem) {
         const updatedItems = prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
-        showToastMessage(`${product.name} কার্টে যোগ করা হয়েছে`)
+        notify(`${product.name} কার্টে যোগ করা হয়েছে`, 'success')
         return updatedItems
       } else {
-        showToastMessage(`${product.name} কার্টে যোগ করা হয়েছে`)
+        notify(`${product.name} কার্টে যোগ করা হয়েছে`, 'success')
         return [...prevItems, { ...product, quantity }]
       }
     })
@@ -42,7 +36,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId))
-    showToastMessage('পণ্য কার্ট থেকে সরানো হয়েছে')
+    notify('পণ্য কার্ট থেকে সরানো হয়েছে', 'error')
   }
 
   const updateQuantity = (productId, newQuantity) => {
@@ -50,7 +44,7 @@ export const CartProvider = ({ children }) => {
       removeFromCart(productId)
       return
     }
-    
+
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === productId ? { ...item, quantity: newQuantity } : item
@@ -78,8 +72,6 @@ export const CartProvider = ({ children }) => {
     clearCart,
     getTotalPrice,
     getTotalItems,
-    showToast,
-    toastMessage,
   }
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FaShoppingCart, FaHome, FaBox, FaSearch, FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import productsData from '../data/products.json'
 
 const Navbar = () => {
   const { getTotalItems } = useCart()
   const { user, currentUser, isAuthenticated, logout } = useAuth()
+  const { notify } = useToast()
   const [searchQuery, setSearchQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -15,7 +17,8 @@ const Navbar = () => {
   const navigate = useNavigate()
   const searchRef = useRef(null)
   const suggestionsRef = useRef(null)
-  const userMenuRef = useRef(null)
+  const desktopUserMenuRef = useRef(null)
+  const mobileUserMenuRef = useRef(null)
 
   // Filter products based on search query
   useEffect(() => {
@@ -41,6 +44,7 @@ const Navbar = () => {
   // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close suggestions
       if (
         searchRef.current &&
         !searchRef.current.contains(event.target) &&
@@ -49,10 +53,13 @@ const Navbar = () => {
       ) {
         setShowSuggestions(false)
       }
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target)
-      ) {
+
+      // Close user menu
+      // Check if click is outside BOTH desktop and mobile menus
+      const isOutsideDesktop = !desktopUserMenuRef.current || !desktopUserMenuRef.current.contains(event.target)
+      const isOutsideMobile = !mobileUserMenuRef.current || !mobileUserMenuRef.current.contains(event.target)
+
+      if (isOutsideDesktop && isOutsideMobile) {
         setShowUserMenu(false)
       }
     }
@@ -66,9 +73,17 @@ const Navbar = () => {
   const handleLogout = async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    await logout()
+
+    // Close menu immediately
     setShowUserMenu(false)
-    navigate('/', { replace: true })
+
+    const success = await logout()
+    if (success) {
+      notify('সফলভাবে লগআউট করা হয়েছে', 'success')
+      navigate('/', { replace: true })
+    } else {
+      notify('লগআউট করা সম্ভব হয়নি', 'error')
+    }
   }
 
   const handleSearch = (e) => {
@@ -181,7 +196,7 @@ const Navbar = () => {
 
             {/* Login/User Menu */}
             {isAuthenticated ? (
-              <div className="relative" ref={userMenuRef}>
+              <div className="relative" ref={desktopUserMenuRef}>
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center space-x-2 text-white hover:text-amber-100 font-medium transition-colors"
@@ -189,7 +204,7 @@ const Navbar = () => {
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     <FaUser />
                   </div>
-                  <span className="hidden lg:inline">{user?.name || currentUser?.displayName || 'User'}</span>
+                  {/* User name removed as requested */}
                 </button>
 
                 {/* User Dropdown Menu */}
@@ -223,7 +238,7 @@ const Navbar = () => {
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center space-x-4 flex-shrink-0">
             {isAuthenticated ? (
-              <div className="relative" ref={userMenuRef}>
+              <div className="relative" ref={mobileUserMenuRef}>
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="text-white hover:text-amber-100 transition-colors"
@@ -237,13 +252,7 @@ const Navbar = () => {
                       <p className="text-xs text-gray-600 truncate">{user?.email || currentUser?.email || ''}</p>
                     </div>
                     <button
-                      onClick={async (e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        await logout()
-                        setShowUserMenu(false)
-                        navigate('/', { replace: true })
-                      }}
+                      onClick={handleLogout}
                       className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-amber-50 transition-colors flex items-center space-x-2"
                     >
                       <FaSignOutAlt />
@@ -260,6 +269,8 @@ const Navbar = () => {
                 <FaUser className="text-xl" />
               </Link>
             )}
+
+
             <Link
               to="/cart"
               className="relative text-white hover:text-amber-100 transition-colors"
