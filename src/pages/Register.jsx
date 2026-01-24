@@ -14,8 +14,7 @@ const Register = () => {
     confirmPassword: '',
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const { register, loginWithGoogle, isAuthenticated } = useAuth()
+  const { register, isAuthenticated } = useAuth()
   const { notify } = useToast()
   const navigate = useNavigate()
 

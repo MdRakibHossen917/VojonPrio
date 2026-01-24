@@ -10,8 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const { login, loginWithGoogle, isAuthenticated } = useAuth()
+  const { login, isAuthenticated } = useAuth()
   const { notify } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -48,19 +47,7 @@ const Login = () => {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true)
 
-    const result = await loginWithGoogle()
-
-    if (result.success) {
-      notify('Google এর মাধ্যমে লগইন সফল হয়েছে', 'success')
-      navigate(from, { replace: true })
-    } else {
-      notify(result.message || 'Google লগইন ব্যর্থ হয়েছে', 'error')
-      setIsGoogleLoading(false)
-    }
-  }
 
   return (
     <>
@@ -139,35 +126,6 @@ const Login = () => {
                   )}
                 </button>
               </form>
-
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">অথবা</span>
-                </div>
-              </div>
-
-              {/* Google Login Button */}
-              <button
-                onClick={handleGoogleLogin}
-                disabled={isLoading || isGoogleLoading}
-                className="w-full bg-white border-2 border-gray-300 text-gray-700 px-6 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 transform hover:scale-105 shadow-md flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isGoogleLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700"></div>
-                    <span>লগইন হচ্ছে...</span>
-                  </>
-                ) : (
-                  <>
-                    <FaGoogle className="text-xl text-red-500" />
-                    <span>Google দিয়ে লগইন করুন</span>
-                  </>
-                )}
-              </button>
 
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">

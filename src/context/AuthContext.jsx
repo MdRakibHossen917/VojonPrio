@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
-import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Registration error:', error)
       let errorMessage = 'রেজিস্টারেশন ব্যর্থ হয়েছে'
-      
+
       if (error.code === 'auth/email-already-in-use') {
         errorMessage = 'এই ইমেইল ইতিমধ্যে ব্যবহার করা হয়েছে'
       } else if (error.code === 'auth/weak-password') {
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Login error:', error)
       let errorMessage = 'লগইন ব্যর্থ হয়েছে'
-      
+
       if (error.code === 'auth/user-not-found') {
         errorMessage = 'এই ইমেইলের কোনো অ্যাকাউন্ট নেই'
       } else if (error.code === 'auth/wrong-password') {
@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
       // Check if user data exists in Firestore
       const userDoc = await getDoc(doc(db, 'users', user.uid))
-      
+
       if (!userDoc.exists()) {
         // Create user data in Firestore for first-time Google sign-in
         const userDataToSave = {
@@ -119,11 +119,13 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Google login error:', error)
       let errorMessage = 'Google লগইন ব্যর্থ হয়েছে'
-      
+
       if (error.code === 'auth/popup-closed-by-user') {
         errorMessage = 'লগইন বাতিল করা হয়েছে'
       } else if (error.code === 'auth/popup-blocked') {
         errorMessage = 'পপআপ ব্লক করা আছে। ব্রাউজার সেটিংস চেক করুন'
+      } else if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = 'এই ডোমেইনটি Firebase এ অনুমোদিত নয়। কনসোল চেক করুন।'
       }
 
       return { success: false, message: errorMessage }
@@ -192,7 +194,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(null)
         setUserData(null)
       }
-      
+
       setIsLoading(false)
     })
 
